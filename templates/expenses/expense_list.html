@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Expenses - Expense Tracker{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Expenses</h1>
+  <a href="{% url 'expense_add' %}" class="btn btn-brand">Add expense</a>
+</div>
+
+<div class="box mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label mb-1" for="period">Period</label>
+      <select name="period" id="period" class="form-select">
+        {% for key, label in periods %}
+          <option value="{{ key }}" {% if key == period %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label mb-1" for="category">Category</label>
+      <select name="category" id="category" class="form-select">
+        <option value="">All categories</option>
+        {% for key, label in categories %}
+          <option value="{{ key }}" {% if key == category %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4 d-flex gap-2">
+      <button type="submit" class="btn btn-outline-brand">Apply filter</button>
+      <a href="{% url 'expense_list' %}" class="btn btn-outline-secondary">Reset</a>
+    </div>
+  </form>
+</div>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+  <div>{{ page.paginator.count }} expense{{ page.paginator.count|pluralize }}, total <strong>Rs. {{ total|floatformat:2 }}</strong></div>
+  <div class="d-flex align-items-center gap-2">
+    <span class="note">Download report:</span>
+    <a class="btn btn-sm btn-outline-secondary" href="{% url 'export_report' 'csv' %}?{{ querystring }}">CSV</a>
+    <a class="btn btn-sm btn-outline-secondary" href="{% url 'export_report' 'pdf' %}?{{ querystring }}">PDF</a>
+  </div>
+</div>
+
+<div class="box p-0">
+  {% if page.object_list %}
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr><th class="ps-3">Date</th><th>Description</th><th>Category</th><th class="amount">Amount</th><th class="pe-3"></th></tr>
+      </thead>
+      <tbody>
+        {% for e in page %}
+        <tr>
+          <td class="ps-3">{{ e.date|date:"d M Y" }}</td>
+          <td>{{ e.description }}{% if e.notes %}<div class="note">{{ e.notes|truncatechars:80 }}</div>{% endif %}</td>
+          <td><span class="tag">{{ e.category }}</span></td>
+          <td class="amount">Rs. {{ e.amount }}</td>
+          <td class="pe-3 text-end text-nowrap">
+            <a href="{% url 'expense_edit' e.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+            <a href="{% url 'expense_delete' e.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="p-4">
+    <p class="mb-1">No expenses match this filter.</p>
+    <a href="{% url 'expense_add' %}">Add an expense</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if page.has_other_pages %}
+<nav class="mt-3 d-flex justify-content-between align-items-center">
+  <div>
+    {% if page.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page.previous_page_number }}">Previous</a>{% endif %}
+    {% if page.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page.next_page_number }}">Next</a>{% endif %}
+  </div>
+  <span class="note">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Delete expense - Expense Tracker{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-6">
+    <h1 class="mb-3">Delete expense</h1>
+    <div class="box">
+      <p>Delete this expense? This can't be undone.</p>
+      <p class="mb-3">
+        <strong>{{ expense.description }}</strong><br>
+        Rs. {{ expense.amount }} &middot; {{ expense.category }} &middot; {{ expense.date|date:"d M Y" }}
+      </p>
+      <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete expense</button>
+        <a href="{% url 'expense_list' %}" class="btn btn-outline-secondary">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

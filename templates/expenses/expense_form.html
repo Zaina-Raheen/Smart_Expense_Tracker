@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if editing %}Edit expense{% else %}Add expense{% endif %} - Expense Tracker{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-6">
+    <h1 class="mb-3">{% if editing %}Edit expense{% else %}Add expense{% endif %}</h1>
+    <div class="box">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
+          {{ form.description }}
+          {% for error in form.description.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6 mb-3">
+            <label class="form-label" for="{{ form.amount.id_for_label }}">Amount (Rs.)</label>
+            {{ form.amount }}
+            {% for error in form.amount.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-6 mb-3">
+            <label class="form-label" for="{{ form.date.id_for_label }}">Date</label>
+            {{ form.date }}
+            {% for error in form.date.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.category.id_for_label }}">Category</label>
+          {{ form.category }}
+          <div class="suggestion" id="suggestion"></div>
+          {% for error in form.category.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.notes.id_for_label }}">Notes</label>
+          {{ form.notes }}
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-brand">{% if editing %}Save changes{% else %}Add expense{% endif %}</button>
+          <a href="{% url 'expense_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>window.PREDICT_URL = "{% url 'predict_api' %}";</script>
+<script src="{% static 'js/form.js' %}"></script>
+{% endblock %}
